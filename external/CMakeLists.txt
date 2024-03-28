@@ -163,6 +163,7 @@ if(APPLE)
             ${BREAKPAD_SOURCES_CLIENT_IOS})
     endif()
 
+    target_compile_definitions(breakpad_client PRIVATE SENTRY_BACKEND_BREAKPAD)
     target_link_libraries(breakpad_client PRIVATE "-framework CoreFoundation")
 endif()
 

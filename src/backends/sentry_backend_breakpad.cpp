@@ -45,7 +45,7 @@ sentry__breakpad_backend_callback(const wchar_t *breakpad_dump_path,
 #elif defined(SENTRY_PLATFORM_DARWIN)
 static bool
 sentry__breakpad_backend_callback(const char *breakpad_dump_path,
-    const char *minidump_id, void *UNUSED(context), bool succeeded)
+    const char *minidump_id, void *UNUSED(context), breakpad_ucontext_t* task_context, bool succeeded)
 #else
 static bool
 sentry__breakpad_backend_callback(
@@ -107,6 +107,13 @@ sentry__breakpad_backend_callback(
             sentry_ucontext_t uctx_data;
             uctx_data.exception_ptrs = *exinfo;
             uctx = &uctx_data;
+#elif defined(SENTRY_PLATFORM_DARWIN)
+            sentry_ucontext_t uctx_data = {};
+            if (task_context)
+            {
+                uctx_data.user_context = task_context;
+                uctx = &uctx_data;
+            }
 #endif
 
             SENTRY_TRACE("invoking `on_crash` hook");
